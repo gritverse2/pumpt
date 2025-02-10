@@ -4,10 +4,5 @@
       "source": "/api/trending",
       "destination": "/api/trending.js"
     }
-  ],
-  "functions": {
-    "api/trending.js": {
-      "runtime": "nodejs18.x"
-    }
-  }
+  ]
 }
