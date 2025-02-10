@@ -1,9 +1,7 @@
 const axios = require("axios");
 const cheerio = require("cheerio");
-const fs = require("fs");
-const path = require("path");
 
-const DATA_FILE = path.join(process.cwd(), "trending.json");
+let trendingData = []; // Variabilă globală pentru a salva datele
 
 async function fetchTrendingWords() {
   try {
@@ -12,10 +10,6 @@ async function fetchTrendingWords() {
     const $ = cheerio.load(data);
     const words = [];
 
-    // Verificăm dacă structura este corectă
-    console.log("🔹 Checking for elements...");
-    console.log($.html().substring(0, 500)); // Afișează o parte din HTML-ul paginii pentru debug
-
     $(".overflow-x-auto button").each((index, element) => {
       const word = $(element).text().trim();
       if (word) {
@@ -23,18 +17,10 @@ async function fetchTrendingWords() {
       }
     });
 
-    console.log("🔹 Extracted words:", words);
-
     if (words.length > 0) {
       const timestamp = new Date().toISOString();
-      let history = [];
-
-      if (fs.existsSync(DATA_FILE)) {
-        history = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
-      }
-
-      history.unshift({ time: timestamp, words });
-      fs.writeFileSync(DATA_FILE, JSON.stringify(history.slice(0, 100), null, 2));
+      trendingData.unshift({ time: timestamp, words });
+      trendingData = trendingData.slice(0, 100); // Salvăm ultimele 100 de înregistrări
 
       console.log("✅ Updated trending words:", words);
       return words;
@@ -52,16 +38,9 @@ async function fetchTrendingWords() {
 module.exports = async function handler(req, res) {
   try {
     console.log("🔹 Serving API request...");
-
-    if (fs.existsSync(DATA_FILE)) {
-      const data = JSON.parse(fs.readFileSync(DATA_FILE, "utf-8"));
-      return res.status(200).json({ current: data[0]?.words || [], history: data });
-    } else {
-      console.log("⚠️ Trending data file not found.");
-      return res.status(200).json({ current: [], history: [] });
-    }
+    res.status(200).json({ current: trendingData[0]?.words || [], history: trendingData });
   } catch (error) {
     console.error("❌ API error:", error);
-    return res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
