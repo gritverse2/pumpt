@@ -8,10 +8,16 @@ async function fetchTrendingWords() {
     console.log("🔹 Fetching trending words...");
     const { data } = await axios.get("https://pump.fun/");
     const $ = cheerio.load(data);
+
+    // Verificăm structura paginii
+    console.log("🔹 First 500 characters of HTML:", data.substring(0, 500));
+
     const words = [];
 
+    // Verificăm selecția elementelor
     $(".overflow-x-auto button").each((index, element) => {
       const word = $(element).text().trim();
+      console.log(`🔹 Found word: ${word}`);
       if (word) {
         words.push(word);
       }
