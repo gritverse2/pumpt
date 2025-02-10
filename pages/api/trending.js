@@ -1,5 +1,5 @@
 import axios from "axios";
-import cheerio from "cheerio";
+const cheerio = require("cheerio");
 
 let trendingData = []; // Variabilă globală pentru a salva datele temporar
 
