@@ -1,5 +1,5 @@
 import axios from "axios";
-import cheerio from "cheerio";
+const cheerio = require("cheerio");
 import fs from "fs";
 import path from "path";
 
