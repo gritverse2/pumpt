@@ -3,7 +3,7 @@ const cheerio = require("cheerio");
 const fs = require("fs");
 const path = require("path");
 
-const DATA_FILE = path.resolve("./public/trending.json");
+const DATA_FILE = path.join(process.cwd(), "trending.json");
 
 async function fetchTrendingWords() {
   try {
