@@ -1,20 +1,20 @@
-import axios from "axios";
+const axios = require("axios");
 const cheerio = require("cheerio");
-
-let trendingData = []; // Variabilă globală pentru a salva datele temporar
 
 async function fetchTrendingWords() {
   try {
     console.log("🔹 Fetching trending words...");
-    const { data } = await axios.get("https://pump.fun/");
-    const $ = cheerio.load(data);
+    
+    // Facem request la Pump.fun
+    const response = await axios.get("https://pump.fun/");
+    
+    // Debugging: afișăm header-ele și primele 500 de caractere din HTML
+    console.log("🔹 Response headers:", response.headers);
+    console.log("🔹 First 500 characters of response:", response.data.substring(0, 500));
 
-    // Verificăm structura paginii
-    console.log("🔹 First 500 characters of HTML:", data.substring(0, 500));
-
+    const $ = cheerio.load(response.data);
     const words = [];
 
-    // Verificăm selecția elementelor
     $(".overflow-x-auto button").each((index, element) => {
       const word = $(element).text().trim();
       console.log(`🔹 Found word: ${word}`);
@@ -24,13 +24,6 @@ async function fetchTrendingWords() {
     });
 
     console.log("✅ Extracted words:", words);
-
-    if (words.length > 0) {
-      const timestamp = new Date().toISOString();
-      trendingData.unshift({ time: timestamp, words });
-      trendingData = trendingData.slice(0, 100); // Salvăm ultimele 100 de înregistrări
-    }
-
     return words;
   } catch (error) {
     console.error("❌ Error fetching trending words:", error);
@@ -42,10 +35,8 @@ async function fetchTrendingWords() {
 export default async function handler(req, res) {
   try {
     console.log("🔹 Serving API request...");
-    if (trendingData.length === 0) {
-      await fetchTrendingWords(); // Dacă nu există date, le luăm acum
-    }
-    res.status(200).json({ current: trendingData[0]?.words || [], history: trendingData });
+    const words = await fetchTrendingWords();
+    res.status(200).json({ current: words, history: [] });
   } catch (error) {
     console.error("❌ API error:", error);
     res.status(500).json({ success: false, error: error.message });
