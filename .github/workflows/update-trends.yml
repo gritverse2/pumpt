@@ -1,0 +1,13 @@
+name: Update Pump.fun Trends
+
+on:
+  schedule:
+    - cron: "*/10 * * * *" # Rulează la fiecare 10 minute
+  workflow_dispatch: # Permite rularea manuală
+
+jobs:
+  update-trends:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call update-trending API
+        run: curl -X GET https://pumpt.vercel.app/api/update-trending
