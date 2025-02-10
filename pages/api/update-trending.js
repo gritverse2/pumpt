@@ -7,7 +7,7 @@ export const config = {
 
 export default async function handler(req, res) {
   try {
-    await axios.get("https://your-vercel-url.vercel.app/api/trending");
+    await axios.get("https://pumpt.vercel.app/api/trending");
     return NextResponse.json({ success: true });
   } catch (error) {
     return NextResponse.json({ error: error.message });
